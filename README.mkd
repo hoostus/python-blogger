@@ -1,5 +1,5 @@
 # Home #
-This project's home on the web is http://github.com/hoostus/python-blogger
+This project's home on the web is <http://github.com/hoostus/python-blogger>
 
 # Rationale #
 I guess I'm just too old school but I prefer composing my blog posts in some
@@ -17,6 +17,7 @@ want. Except I can't help myself so I made some small changes to it.
 
 # Dependencies #
 You'll need a few extra things installed in order to make the script work.
+
 - [PyMarkdown][pymarkdown]
 - [gdata][gdata]
 

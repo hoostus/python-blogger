@@ -1,0 +1,96 @@
+# Home #
+This project's home on the web is http://github.com/hoostus/python-blogger
+
+# Rationale #
+I guess I'm just too old school but I prefer composing my blog posts in some
+ASCII like format like markdown rather than a WYSIWYG HTML editor in my web
+browser. I can use vim. The markup isn't terrible. I can even, theoretically,
+move the content to another system pretty easily.
+
+I use Blogspot because I have no need to run my own blog software. Blogspot
+offers everything I need, which isn't much.
+
+# History #
+Obviously I'm not the first person to want to do such a thing. Google turned up
+a [python script from Brian Wisti][wisti] that basically does exactly what I
+want. Except I can't help myself so I made some small changes to it.
+
+# Dependencies #
+You'll need a few extra things installed in order to make the script work.
+- [PyMarkdown][pymarkdown]
+- [gdata][gdata]
+
+# How it works #
+1. Write a text file using the [Markdown syntax][syntax].
+2. Include special [Markdown metadata][metadata] for things like Title and Tags.
+3. Run the script, specifying the file containing the post as an argument.
+
+        ./post-to-blog.py post.mkd
+
+    If you have a configuration file that will be used. Any
+    configuration that is missing will be queried interactively.
+
+# Configuration #
+By default a file named **blog.cfg** in the current directory is looked for. The
+syntax is pretty simple:
+
+    [connection] # this section name is mandatory
+    author=Your Name
+    email=email@example.com
+    password=blogger-password
+
+Every field---the entire file, actually---is optional. However, if it isn't
+present then you will be asked for it when you submit a post to Blogspot.
+
+## Passwords ##
+If you don't want to put your password in a plain text file I don't blame you.
+If you leave it out you will be queried interactively for it each time you
+submit a post to Blogspot.
+
+# Metadata #
+An extended version of Markdown syntax is used that [allows you to specify
+metadata in your post][metadata]. Metadata is a series of keywords and values at
+the beginning of your document like so
+
+    keyword: value
+    keyword2: value
+    keyword3: value 1
+            value 2 of keyword 3
+            value 3 of keyword 3
+
+    The first paragraph of the post.
+
+You can put in any metadata you want. Anything the script doesn't understand
+will be ignored however.
+
+All tags understood by the script are case-insensitive. That is, you can use
+either *title* or *Title* (or even *tItLe* if you want).
+
+## Title ##
+The *title* metadata (case-insensitive) key will be the blogpost title.
+
+## Tags ##
+The *tags* metadata (case-insensitive) key will be one or more tags to apply to
+the post.
+
+# Other extensions #
+[Several other extensions to Markdown are enabled][extras] that may make writing
+blogposts easier. These include:
+
+- [Code highlighting][hilite]. This will require that [Pygments][pygments] by
+installed.
+- [Abbreviations][abbr] to make using the <abbr> tag simple for abbreviations.
+- [Footnotes][foot] if you, like me, are footnote inclined.
+- [Tables][tables] if you really need to create a simple table.
+
+[wisti]: http://brianwisti.blogspot.com/2009/06/python-blogger-refresh-part-2-settings.html
+[pymarkdown]: http://www.freewisdom.org/projects/python-markdown/
+[gdata]: http://code.google.com/p/gdata-python-client/
+[syntax]: http://daringfireball.net/projects/markdown/syntax
+[metadata]: http://www.freewisdom.org/projects/python-markdown/Meta-Data
+[hilite]: http://www.freewisdom.org/projects/python-markdown/CodeHilite
+[pygments]: http://pygments.org/
+[extras]: http://www.freewisdom.org/projects/python-markdown/Extra
+[abbr]: http://www.freewisdom.org/projects/python-markdown/Abbreviations
+[foot]: http://www.freewisdom.org/projects/python-markdown/Footnotes
+[tables]: http://www.freewisdom.org/projects/python-markdown/Tables

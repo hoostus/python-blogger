@@ -169,7 +169,7 @@ def ask_user_for_missing_config(config):
 
 
 def main():
-    config_file = "config/blog.cfg"
+    config_file = "blog.cfg"
     config = ConfigParser.ConfigParser()
     config.read(config_file)
 

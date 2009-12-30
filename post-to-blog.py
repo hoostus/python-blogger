@@ -143,11 +143,11 @@ def parse_cmdline(config):
 
 def ask_user_for_missing_config(config):
     query = {
-            'password' : getpass.getpass,
             'email' : raw_input,
-            'filename' : raw_input
+            'password' : getpass.getpass,
+            'filename' : raw_input,
     }
-    for option in query.keys():
+    for option in ['email', 'password', 'filename']:
         try:
             value = config.get("connection", option)
         except ConfigParser.NoOptionError, NameError:

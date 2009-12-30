@@ -31,12 +31,18 @@ You'll need a few extra things installed in order to make the script work.
     If you have a configuration file that will be used. Any
     configuration that is missing will be queried interactively.
 
+## Drafts ##
+**Important!** All posts are submitted as "drafts". This allows you to log into
+Blogspot and take a look at the resulting output prior to publishing them.
+
+## I have multiple blogs / Posts go to the wrong blog ##
+**Warning**. Right now the script automatically posts to the first blog in your list of blogs.
+
 # Configuration #
 By default a file named **blog.cfg** in the current directory is looked for. The
 syntax is pretty simple:
 
     [connection] # this section name is mandatory
-    author=Your Name
     email=email@example.com
     password=blogger-password
 
@@ -64,8 +70,8 @@ the beginning of your document like so
 You can put in any metadata you want. Anything the script doesn't understand
 will be ignored however.
 
-All tags understood by the script are case-insensitive. That is, you can use
-either *title* or *Title* (or even *tItLe* if you want).
+All metadata keywords are case-insensitive. That is, you can use either *title*
+or *Title* (or even *tItLe* if you want).
 
 ## Title ##
 The *title* metadata (case-insensitive) key will be the blogpost title.

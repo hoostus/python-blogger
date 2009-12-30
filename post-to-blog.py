@@ -1,59 +1,48 @@
 #!/usr/bin/python
+# ts=4 sw=4 et
 
-# post-to-blog.py
+import sys
+import getpass
+import ConfigParser
+# make dealing with the prompts a little bit nicer if we can
+try:
+    import readline
+except ImportError:
+    pass
+import logging
+logging.basicConfig(format='%(levelname)s :: %(message)s')
 
 import markdown
 from xml.etree import ElementTree
 from gdata import service
 import gdata
 import atom
-import sys
-import getpass
-import readline
-import ConfigParser
 
 class BlogPost(object):
     """A single posting for a blog owned by a Blogger account
 
-    >>> post = BlogPost('Brian Wisti', 'me@here.com', 'mysecretpassword')
-    >>> post.body = 'This is a paragraph'
+    >>> post = BlogPost('me@here.com', 'mysecretpassword')
+    >>> post.parsePost('This is a paragraph')
     >>> print post.body
     <p>This is a paragraph</p>
     """
 
-    def __init__(self, author, account, password):
+    def __init__(self, account, password):
         self.config = {}
-        self.__author = author
         self.__account = account
         self.__password = password
         self.markdown = markdown.Markdown(extensions = ['meta', 'extra', 'codehilite'])
         self.blogger = None
-
-    def parseConfig(self, configText):
-        """Reads and stores the directives from the post's config header.
-
-        >>> post = BlogPost('Brian Wisti', 'me@here.com', 'mysecretpassword')
-        >>> import os
-        >>> myConfig = os.linesep.join(["key1: value1", "key2: value2"])
-        >>> post.parseConfig(myConfig)
-        >>> post.config['key1']
-        'value1'
-        >>> post.config['key2']
-        'value2'
-        """
-        textLines = configText.splitlines()
-        for line in textLines:
-            key, value = line.split(': ')
-            self.config[key] = value
+        self.meta = {}
 
     def parsePost(self, postText):
         """Parses the contents of a full post, including header and body.
 
         >>> import os
-        >>> myText = os.linesep.join(["title: Test", "--", "This is a test"])
-        >>> post = BlogPost('Brian Wisti', 'me@here.com', 'mysecretpassword')
+        >>> myText = os.linesep.join(["title: Test", "", "This is a test"])
+        >>> post = BlogPost('me@here.com', 'mysecretpassword')
         >>> post.parsePost(myText)
-        >>> print post.config['title']
+        >>> print post.get_title()
         Test
         >>> print post.body
         <p>This is a test</p>
@@ -61,6 +50,13 @@ class BlogPost(object):
         self.raw = postText
         self.body = self.markdown.convert(postText)
         self.meta = self.markdown.Meta
+        if not self.meta.has_key('title'):
+            logging.warn('No title specified for post.')
+        if len(self.meta.get('title', [])) > 1:
+            logging.warn('Title cannot have multiple values.')
+
+    def get_title(self):
+        return self.meta.get('title', [''])[0]
 
     def login(self):
         if self.blogger == None:
@@ -87,8 +83,7 @@ class BlogPost(object):
     def create_entry(self):
         # Create the entry to insert.
         entry = gdata.GDataEntry()
-        entry.author.append(atom.Author(atom.Name(text=self.__author)))
-        entry.title = atom.Title('xhtml', self.meta.get('title', ''))
+        entry.title = atom.Title('xhtml', self.get_title())
         entry.content = atom.Content(content_type='html', text=self.body)
 
         # Assemble labels, if any
@@ -120,8 +115,6 @@ def parse_cmdline(config):
                       help="Do not actually submit to blogger")
     parser.add_option("-f", "--file", dest="filename",
                       help="Specify source file for post")
-    parser.add_option("-a", "--author", dest="author",
-                      help="The author for this post")
     parser.add_option("-e", "--email", dest="email",
                       help="The email of the blog owner")
     parser.add_option("-p", "--password", dest="password",
@@ -131,9 +124,6 @@ def parse_cmdline(config):
 
     (options, args) = parser.parse_args()
     # Allow command line options to overwrite config settings
-    if options.author:
-        config.set("connection", "author", options.author)
-
     if options.email:
         config.set("connection", "email", options.email)
 
@@ -154,7 +144,6 @@ def parse_cmdline(config):
 def ask_user_for_missing_config(config):
     query = {
             'password' : getpass.getpass,
-            'author' : raw_input,
             'email' : raw_input,
             'filename' : raw_input
     }
@@ -166,7 +155,6 @@ def ask_user_for_missing_config(config):
             config.set("connection", option, value)
 
     return config
-
 
 def main():
     config_file = "blog.cfg"
@@ -181,12 +169,11 @@ def main():
 
     ask_user_for_missing_config(config)
 
-    author = config.get("connection", "author")
     email = config.get("connection", "email")
     password = config.get("connection", "password")
     filename = config.get("connection", "filename")
 
-    post = BlogPost(author, email, password)
+    post = BlogPost(email, password)
     postFile = open(filename).read()
     post.parsePost(postFile)
 
@@ -199,7 +186,7 @@ def main():
 
     if not options.dryRun:
         blog_id = post.get_blog_id()
-        post.sendPost(blog_id)
+        post.sendPost(blog_id, entry)
 
 if __name__ == '__main__':
     main()
